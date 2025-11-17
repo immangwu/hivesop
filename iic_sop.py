@@ -294,7 +294,7 @@ if 'budget_items' not in st.session_state:
 
 if 'income_sources' not in st.session_state:
     st.session_state.income_sources = [
-        {'source': 'IIC Fund', 'amount': 0.0},
+        {'source': 'Departmental Fund', 'amount': 0.0},
     ]
 
 # IIC Activity Database
@@ -388,7 +388,6 @@ BUDGET_CATEGORIES = [
 ]
 
 INCOME_SOURCES = [
-    "IIC Fund",
     "Departmental Fund",
     "College Fund",
     "Sponsorship",
@@ -1327,7 +1326,7 @@ def main():
                     st.rerun()
     
     if st.button("➕ Add Income Source", key="add_income"):
-        st.session_state.income_sources.append({'source': 'IIC Fund', 'amount': 0.0})
+        st.session_state.income_sources.append({'source': 'Departmental Fund', 'amount': 0.0})
         st.rerun()
     
     total_income = sum(source['amount'] for source in st.session_state.income_sources)
