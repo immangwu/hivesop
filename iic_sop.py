@@ -68,7 +68,7 @@ st.markdown("""
         color: #ffffff;
         text-align: center;
         margin-bottom: 0.5rem;
-        text-shadow: 2px 4px 8px rgba(0,0,0,0.3);
+        text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
         letter-spacing: -1px;
         position: relative;
         z-index: 1;
@@ -76,12 +76,13 @@ st.markdown("""
     
     .header-subtitle {
         text-align: center;
-        color: #e0e7ff;
+        color: #ffffff;
         font-size: 1.25rem;
-        font-weight: 500;
+        font-weight: 600;
         letter-spacing: 0.5px;
         position: relative;
         z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
     }
     
     .section-header {
@@ -213,6 +214,8 @@ st.markdown("""
         padding: 0.75rem;
         font-size: 1rem;
         transition: all 0.3s ease;
+        background-color: white;
+        color: #1f2937;
     }
     
     .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
@@ -225,6 +228,18 @@ st.markdown("""
         border: 2px solid #e5e7eb;
         padding: 0.75rem;
         font-size: 1rem;
+        background-color: white;
+        color: #1f2937;
+    }
+    
+    label {
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .stMarkdown {
+        color: #1f2937;
     }
     
     hr {
@@ -634,7 +649,7 @@ def create_professional_pdf(data):
     main_data.append([
         Paragraph("<b>2</b>", table_text_style),
         Paragraph("<b>Nature of Programme</b>", table_text_style),
-        Paragraph(f"{data['event_type']} ({data['event_level']})", table_text_style)
+        Paragraph(f"<b>{data['event_type']}</b> ({data['event_level']})", table_text_style)
     ])
     
     # Row 3: Title
@@ -647,16 +662,17 @@ def create_professional_pdf(data):
     # Row 4: Coordinators (Multiple)
     coordinators_text = ""
     for i, coord in enumerate(data['coordinators'], 1):
-        coordinators_text += f"{i}. {coord['name']}"
+        if i > 1:
+            coordinators_text += "<br/>"
+        coordinators_text += f"<b>{i}.</b> {coord['name']}"
         if coord['designation']:
             coordinators_text += f", {coord['designation']}"
         if coord['department']:
-            coordinators_text += f" / {coord['department']}"
-        coordinators_text += "<br/>"
+            coordinators_text += f", {coord['department']}"
     
     main_data.append([
         Paragraph("<b>4</b>", table_text_style),
-        Paragraph("<b>Name of the Faculty Coordinator(s)</b>", table_text_style),
+        Paragraph("<b>Name of the Faculty<br/>Coordinator(s)</b>", table_text_style),
         Paragraph(coordinators_text, table_text_style)
     ])
     
@@ -664,7 +680,7 @@ def create_professional_pdf(data):
     main_data.append([
         Paragraph("<b>5</b>", table_text_style),
         Paragraph("<b>Date and Day</b>", table_text_style),
-        Paragraph(data['date_day'], table_text_style)
+        Paragraph(f"<b>{data['date_day']}</b>", table_text_style)
     ])
     
     # Row 6: Time
@@ -678,7 +694,7 @@ def create_professional_pdf(data):
     main_data.append([
         Paragraph("<b>7</b>", table_text_style),
         Paragraph("<b>Venue</b>", table_text_style),
-        Paragraph(data['venue'], table_text_style)
+        Paragraph(f"<b>{data['venue']}</b>", table_text_style)
     ])
     
     # Row 8: Participants
@@ -692,71 +708,73 @@ def create_professional_pdf(data):
     main_data.append([
         Paragraph("<b>9</b>", table_text_style),
         Paragraph("<b>Total Audience Expected</b>", table_text_style),
-        Paragraph(str(data['expected_audience']), table_text_style)
+        Paragraph(f"<b>{str(data['expected_audience'])}</b>", table_text_style)
     ])
     
     # Row 10: Resource Persons (Multiple)
     resource_persons_text = ""
     for i, rp in enumerate(data['resource_persons'], 1):
+        if i > 1:
+            resource_persons_text += "<br/><br/>"
         resource_persons_text += f"<b>Resource Person {i}:</b><br/>"
-        resource_persons_text += f"Name: {rp['name']}<br/>"
+        resource_persons_text += f"<b>Name:</b> {rp['name']}<br/>"
         if rp['designation']:
-            resource_persons_text += f"Designation: {rp['designation']}<br/>"
+            resource_persons_text += f"<b>Designation:</b> {rp['designation']}<br/>"
         if rp['organization']:
-            resource_persons_text += f"Organization: {rp['organization']}<br/>"
+            resource_persons_text += f"<b>Organization:</b> {rp['organization']}<br/>"
         if rp['address']:
-            resource_persons_text += f"Address: {rp['address']}<br/>"
+            resource_persons_text += f"<b>Address:</b> {rp['address']}<br/>"
         if rp['phone']:
-            resource_persons_text += f"Phone: {rp['phone']}<br/>"
+            resource_persons_text += f"<b>Phone:</b> {rp['phone']}<br/>"
         if rp['email']:
-            resource_persons_text += f"Email: {rp['email']}<br/>"
-        if i < len(data['resource_persons']):
-            resource_persons_text += "<br/>"
+            resource_persons_text += f"<b>Email:</b> {rp['email']}"
     
     main_data.append([
         Paragraph("<b>10</b>", table_text_style),
-        Paragraph("<b>Details of Resource Person(s)</b><br/><i>(Name, Designation, Organization, Address, Phone, Email)</i>", table_text_style),
+        Paragraph("<b>Details of Resource<br/>Person(s)</b><br/><i style='font-size:7pt'>(Name, Designation,<br/>Organization, Address,<br/>Phone, Email)</i>", table_text_style),
         Paragraph(resource_persons_text, table_text_style)
     ])
     
-    # Create main table
-    main_table = Table(main_data, colWidths=[12*mm, 58*mm, 100*mm])
+    # Create main table with better proportions
+    main_table = Table(main_data, colWidths=[10*mm, 50*mm, 110*mm])
     main_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (1, -1), table_header),
         ('TEXTCOLOR', (0, 0), (-1, -1), text_color),
         ('ALIGN', (0, 0), (0, -1), 'CENTER'),
-        ('ALIGN', (1, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('ALIGN', (2, 0), (2, -1), 'LEFT'),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 8.5),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('BOX', (0, 0), (-1, -1), 1.5, primary_color),
-        ('LEFTPADDING', (0, 0), (-1, -1), 5),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
-        ('TOPPADDING', (0, 0), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('BOX', (0, 0), (-1, -1), 2, primary_color),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('LINEABOVE', (0, 0), (-1, 0), 2, primary_color),
     ]))
     story.append(main_table)
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 15))
     
     # Financial Details Section
     if data.get('budget_items') and len(data['budget_items']) > 0:
         story.append(Paragraph("<b>11. BUDGET STATEMENT</b>", heading_style))
-        story.append(Spacer(1, 6))
+        story.append(Spacer(1, 8))
         
         # Income Section
         story.append(Paragraph("<b>A. SOURCES OF INCOME</b>", ParagraphStyle(
             'SubHeading',
             parent=normal_style,
-            fontSize=9,
+            fontSize=10,
             textColor=primary_color,
             fontName='Helvetica-Bold',
-            spaceAfter=4
+            spaceAfter=6
         )))
         
         income_data = [
             [Paragraph("<b>S.No</b>", table_text_style),
-             Paragraph("<b>Source</b>", table_text_style),
+             Paragraph("<b>Source of Income</b>", table_text_style),
              Paragraph("<b>Amount (₹)</b>", table_text_style)]
         ]
         
@@ -764,16 +782,31 @@ def create_professional_pdf(data):
         for i, source in enumerate(data['income_sources'], 1):
             if source['amount'] > 0:
                 income_data.append([
-                    Paragraph(str(i), table_text_style),
+                    Paragraph(f"<b>{i}</b>", table_text_style),
                     Paragraph(source['source'], table_text_style),
-                    Paragraph(f"{source['amount']:,.2f}", table_text_style)
+                    Paragraph(f"{source['amount']:,.2f}", ParagraphStyle(
+                        'AmountStyle',
+                        parent=table_text_style,
+                        alignment=TA_RIGHT
+                    ))
                 ])
                 total_income += source['amount']
         
         income_data.append([
-            Paragraph("<b>TOTAL INCOME</b>", table_text_style),
             Paragraph("", table_text_style),
-            Paragraph(f"<b>₹ {total_income:,.2f}</b>", table_text_style)
+            Paragraph("<b>TOTAL INCOME</b>", ParagraphStyle(
+                'BoldText',
+                parent=table_text_style,
+                fontName='Helvetica-Bold',
+                fontSize=9
+            )),
+            Paragraph(f"<b>₹ {total_income:,.2f}</b>", ParagraphStyle(
+                'BoldAmount',
+                parent=table_text_style,
+                fontName='Helvetica-Bold',
+                fontSize=9,
+                alignment=TA_RIGHT
+            ))
         ])
         
         income_table = Table(income_data, colWidths=[15*mm, 115*mm, 40*mm])
@@ -781,27 +814,30 @@ def create_professional_pdf(data):
             ('BACKGROUND', (0, 0), (-1, 0), primary_color),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (0, -1), 'CENTER'),
+            ('ALIGN', (1, 0), (1, -1), 'LEFT'),
             ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8.5),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-            ('BOX', (0, 0), (-1, -1), 1.5, primary_color),
+            ('BOX', (0, 0), (-1, -1), 2, primary_color),
             ('BACKGROUND', (0, -1), (-1, -1), table_header),
-            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-            ('TOPPADDING', (0, 0), (-1, -1), 5),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+            ('LINEABOVE', (0, -1), (-1, -1), 2, primary_color),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('LEFTPADDING', (0, 0), (-1, -1), 8),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 8),
         ]))
         story.append(income_table)
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 12))
         
         # Expenditure Section
         story.append(Paragraph("<b>B. EXPENDITURE DETAILS</b>", ParagraphStyle(
             'SubHeading',
             parent=normal_style,
-            fontSize=9,
+            fontSize=10,
             textColor=primary_color,
             fontName='Helvetica-Bold',
-            spaceAfter=4
+            spaceAfter=6
         )))
         
         expense_data = [
@@ -815,63 +851,122 @@ def create_professional_pdf(data):
         for i, item in enumerate(data['budget_items'], 1):
             if item['amount'] > 0:
                 expense_data.append([
-                    Paragraph(str(i), table_text_style),
+                    Paragraph(f"<b>{i}</b>", table_text_style),
                     Paragraph(item['category'], table_text_style),
-                    Paragraph(item['description'] or '-', table_text_style),
-                    Paragraph(f"{item['amount']:,.2f}", table_text_style)
+                    Paragraph(item['description'] if item['description'] else '-', table_text_style),
+                    Paragraph(f"{item['amount']:,.2f}", ParagraphStyle(
+                        'AmountStyle',
+                        parent=table_text_style,
+                        alignment=TA_RIGHT
+                    ))
                 ])
                 total_expense += item['amount']
         
         expense_data.append([
-            Paragraph("<b>TOTAL EXPENDITURE</b>", table_text_style),
             Paragraph("", table_text_style),
+            Paragraph("<b>TOTAL EXPENDITURE</b>", ParagraphStyle(
+                'BoldText',
+                parent=table_text_style,
+                fontName='Helvetica-Bold',
+                fontSize=9
+            )),
             Paragraph("", table_text_style),
-            Paragraph(f"<b>₹ {total_expense:,.2f}</b>", table_text_style)
+            Paragraph(f"<b>₹ {total_expense:,.2f}</b>", ParagraphStyle(
+                'BoldAmount',
+                parent=table_text_style,
+                fontName='Helvetica-Bold',
+                fontSize=9,
+                alignment=TA_RIGHT
+            ))
         ])
         
-        expense_table = Table(expense_data, colWidths=[15*mm, 45*mm, 70*mm, 40*mm])
+        expense_table = Table(expense_data, colWidths=[15*mm, 50*mm, 65*mm, 40*mm])
         expense_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), primary_color),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (0, -1), 'CENTER'),
+            ('ALIGN', (1, 0), (2, -1), 'LEFT'),
             ('ALIGN', (3, 0), (3, -1), 'RIGHT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8.5),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-            ('BOX', (0, 0), (-1, -1), 1.5, primary_color),
+            ('BOX', (0, 0), (-1, -1), 2, primary_color),
             ('BACKGROUND', (0, -1), (-1, -1), table_header),
-            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-            ('TOPPADDING', (0, 0), (-1, -1), 5),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+            ('LINEABOVE', (0, -1), (-1, -1), 2, primary_color),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('LEFTPADDING', (0, 0), (-1, -1), 8),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 8),
         ]))
         story.append(expense_table)
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 12))
         
         # Summary
         balance = total_income - total_expense
+        balance_color = colors.HexColor('#10b981') if balance >= 0 else colors.HexColor('#ef4444')
+        
         summary_data = [
-            [Paragraph("<b>Total Income</b>", table_text_style), Paragraph(f"₹ {total_income:,.2f}", table_text_style)],
-            [Paragraph("<b>Total Expenditure</b>", table_text_style), Paragraph(f"₹ {total_expense:,.2f}", table_text_style)],
-            [Paragraph("<b>Balance</b>", table_text_style), Paragraph(f"<b>₹ {balance:,.2f}</b>", table_text_style)]
+            [Paragraph("<b>Total Income</b>", ParagraphStyle(
+                'SummaryLabel',
+                parent=table_text_style,
+                fontSize=10,
+                fontName='Helvetica-Bold'
+            )), 
+            Paragraph(f"<b>₹ {total_income:,.2f}</b>", ParagraphStyle(
+                'SummaryAmount',
+                parent=table_text_style,
+                fontSize=10,
+                fontName='Helvetica-Bold',
+                alignment=TA_RIGHT
+            ))],
+            [Paragraph("<b>Total Expenditure</b>", ParagraphStyle(
+                'SummaryLabel',
+                parent=table_text_style,
+                fontSize=10,
+                fontName='Helvetica-Bold'
+            )), 
+            Paragraph(f"<b>₹ {total_expense:,.2f}</b>", ParagraphStyle(
+                'SummaryAmount',
+                parent=table_text_style,
+                fontSize=10,
+                fontName='Helvetica-Bold',
+                alignment=TA_RIGHT
+            ))],
+            [Paragraph("<b>Balance</b>", ParagraphStyle(
+                'SummaryLabel',
+                parent=table_text_style,
+                fontSize=11,
+                fontName='Helvetica-Bold',
+                textColor=balance_color
+            )), 
+            Paragraph(f"<b>₹ {balance:,.2f}</b>", ParagraphStyle(
+                'SummaryAmount',
+                parent=table_text_style,
+                fontSize=11,
+                fontName='Helvetica-Bold',
+                alignment=TA_RIGHT,
+                textColor=balance_color
+            ))]
         ]
         
         summary_table = Table(summary_data, colWidths=[130*mm, 40*mm])
         summary_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, -1), table_header),
-            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-            ('BOX', (0, 0), (-1, -1), 1.5, primary_color),
-            ('TOPPADDING', (0, 0), (-1, -1), 5),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+            ('BOX', (0, 0), (-1, -1), 2, primary_color),
+            ('LINEABOVE', (0, -1), (-1, -1), 2, balance_color),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('LEFTPADDING', (0, 0), (-1, -1), 8),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 8),
         ]))
         story.append(summary_table)
-        story.append(Spacer(1, 12))
+        story.append(Spacer(1, 15))
     else:
         story.append(Paragraph("<b>11. ESTIMATED EXPENDITURE</b>", heading_style))
         story.append(Paragraph("NIL", normal_style))
-        story.append(Spacer(1, 8))
+        story.append(Spacer(1, 10))
     
     # Objective
     story.append(Paragraph("<b>12. OBJECTIVE OF THE PROGRAMME</b>", heading_style))
@@ -1011,13 +1106,40 @@ def main():
     with col2:
         st.markdown('<div class="form-card">', unsafe_allow_html=True)
         
-        event_date = st.date_input(
-            "Event Date *",
-            min_value=date.today(),
-            help="Select the event date"
+        # Date range instead of single date
+        col_date1, col_date2 = st.columns(2)
+        with col_date1:
+            event_date_from = st.date_input(
+                "Event Start Date *",
+                min_value=date.today(),
+                help="Select the event start date"
+            )
+        with col_date2:
+            event_date_to = st.date_input(
+                "Event End Date *",
+                min_value=event_date_from,
+                value=event_date_from,
+                help="Select the event end date"
+            )
+        
+        # Manual quarter selection
+        quarter_options = {
+            "Q1 (Sep-Nov): Inspiration, Motivation, Ideation": "Q1",
+            "Q2 (Dec-Feb): Validation, Concept Development": "Q2",
+            "Q3 (Mar-May): Prototype, Business Model Development": "Q3",
+            "Q4 (Jun-Aug): Start-up Ecosystem, Scale Up": "Q4"
+        }
+        
+        selected_quarter_display = st.selectbox(
+            "IIC Quarter *",
+            options=list(quarter_options.keys()),
+            help="Select the IIC quarter for this event"
         )
         
-        quarter_info = get_quarter_info(event_date)
+        selected_quarter = quarter_options[selected_quarter_display]
+        quarter_info = IIC_ACTIVITIES[selected_quarter]
+        quarter_info['quarter'] = selected_quarter
+        
         st.success(f"📅 {quarter_info['quarter']} • {quarter_info['thrust_area']}")
         
         col_time1, col_time2 = st.columns(2)
@@ -1209,7 +1331,12 @@ def main():
         st.rerun()
     
     total_income = sum(source['amount'] for source in st.session_state.income_sources)
-    st.metric("Total Income", f"₹ {total_income:,.2f}")
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-label">Total Income</div>
+        <div class="metric-value">₹ {total_income:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -1260,16 +1387,40 @@ def main():
     
     col_metric1, col_metric2, col_metric3 = st.columns(3)
     with col_metric1:
-        st.metric("Total Expenditure", f"₹ {total_expense:,.2f}")
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-label">Total Expenditure</div>
+            <div class="metric-value">₹ {total_expense:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
     with col_metric2:
-        st.metric("Balance", f"₹ {balance:,.2f}", delta=f"{balance:,.2f}")
+        balance_color = "#10b981" if balance >= 0 else "#ef4444"
+        st.markdown(f"""
+        <div class="metric-card" style="border-top-color: {balance_color};">
+            <div class="metric-label">Balance</div>
+            <div class="metric-value" style="color: {balance_color};">₹ {balance:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
     with col_metric3:
         if balance < 0:
-            st.error("⚠️ Budget Deficit!")
+            status_color = "#ef4444"
+            status_icon = "⚠️"
+            status_text = "Budget Deficit"
         elif balance > 0:
-            st.success("✅ Budget Surplus")
+            status_color = "#10b981"
+            status_icon = "✅"
+            status_text = "Budget Surplus"
         else:
-            st.info("⚖️ Balanced Budget")
+            status_color = "#3b82f6"
+            status_icon = "⚖️"
+            status_text = "Balanced Budget"
+        
+        st.markdown(f"""
+        <div class="metric-card" style="border-top-color: {status_color};">
+            <div class="metric-label">Budget Status</div>
+            <div class="metric-value" style="color: {status_color}; font-size: 1.3rem;">{status_icon} {status_text}</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Generate Button
     st.markdown("---")
@@ -1308,8 +1459,16 @@ def main():
         else:
             with st.spinner("🔄 Generating your professional SOP document with AI-powered content..."):
                 # Generate content
-                day_name = event_date.strftime("%A")
-                date_str = event_date.strftime("%d.%m.%Y")
+                day_name_from = event_date_from.strftime("%A")
+                day_name_to = event_date_to.strftime("%A")
+                date_str_from = event_date_from.strftime("%d.%m.%Y")
+                date_str_to = event_date_to.strftime("%d.%m.%Y")
+                
+                # Create date display
+                if event_date_from == event_date_to:
+                    date_display = f"{date_str_from} ({day_name_from})"
+                else:
+                    date_display = f"{date_str_from} ({day_name_from}) to {date_str_to} ({day_name_to})"
                 
                 objective = generate_objective(event_title, event_type, quarter_info)
                 student_dev = generate_student_development(event_title, event_type)
@@ -1322,7 +1481,7 @@ def main():
                     'event_level': event_info['level'],
                     'event_title': event_title,
                     'coordinators': valid_coordinators,
-                    'date_day': f"{date_str} ({day_name})",
+                    'date_day': date_display,
                     'time': f"From {time_from.strftime('%I:%M %p')} to {time_to.strftime('%I:%M %p')}",
                     'venue': venue,
                     'participants': participants,
@@ -1356,7 +1515,7 @@ def main():
                     <div class="info-card">
                     <b>Event:</b> {event_title}<br/>
                     <b>Type:</b> {event_type} ({event_info['level']})<br/>
-                    <b>Date:</b> {date_str} ({day_name})<br/>
+                    <b>Date:</b> {date_display}<br/>
                     <b>Quarter:</b> {quarter_info['quarter']} - {quarter_info['thrust_area']}<br/>
                     <b>Coordinators:</b> {len(valid_coordinators)}<br/>
                     <b>Resource Persons:</b> {len(valid_resource_persons)}<br/>
@@ -1391,7 +1550,7 @@ def main():
                 col_dl = st.columns([1, 2, 1])
                 
                 with col_dl[1]:
-                    filename = f"IIC_SOP_{event_date.strftime('%Y%m%d')}_{event_title[:40].replace(' ', '_')}.pdf"
+                    filename = f"IIC_SOP_{event_date_from.strftime('%Y%m%d')}_{event_title[:40].replace(' ', '_')}.pdf"
                     st.download_button(
                         label="📥 DOWNLOAD PROFESSIONAL SOP DOCUMENT (PDF)",
                         data=pdf_buffer,
